@@ -64,6 +64,8 @@ SQLite (for local MLflow tracking)
 
 Step-by-Step
 
+Note:Extract .zip file then follow this steps
+
 1. Install Dependencies
 
                          pip install -r requirements.txt
