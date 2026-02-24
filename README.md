@@ -97,15 +97,12 @@ DB_URL = os.getenv("FIREBASE_DB_URL", "[https://YOUR-NEW-PROJECT-ID.firebasedata
 
    🚦 How to Run
 
-
-  <img width="1021" height="626" alt="image" src="https://github.com/user-attachments/assets/36fa5e91-53d0-4459-a31c-96c491253d08" />
-
-
+<img width="372" height="117" alt="image" src="https://github.com/user-attachments/assets/7ae6e87b-2f72-45ce-882f-84b01b1ab00f" />
 
    📂 Project Architecture
 
+<img width="1021" height="626" alt="image" src="https://github.com/user-attachments/assets/bc6e47c1-c9c8-4038-ab5c-a11643897b44" />
 
-<img width="295" height="235" alt="image" src="https://github.com/user-attachments/assets/a8d80dde-2d32-4ca5-8730-2b4722c9a37e" />
 
     ⚖️ License & Classification
 SATELLITE OPERATIONS // PROPRIETARY // INTERNAL USE ONLY © 2026 CubeSat 3D Anomaly Engine. All rights reserved.
