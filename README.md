@@ -98,7 +98,8 @@ DB_URL = os.getenv("FIREBASE_DB_URL", "[https://YOUR-NEW-PROJECT-ID.firebasedata
    🚦 How to Run
 
 
-   <img width="653" height="150" alt="image" src="https://github.com/user-attachments/assets/785e91ac-ce1a-416e-be21-a73e8a47657e" />
+  <img width="1021" height="626" alt="image" src="https://github.com/user-attachments/assets/36fa5e91-53d0-4459-a31c-96c491253d08" />
+
 
 
    📂 Project Architecture
