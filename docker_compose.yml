@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  mission-control:
+    build: .  # This dot tells Docker: "Look in the current folder"
+    image: cubesat-mlops-app
+    ports:
+      - "8501:8501"
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONUNBUFFERED=1
