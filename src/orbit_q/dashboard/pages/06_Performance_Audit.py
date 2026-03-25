@@ -1,7 +1,7 @@
 # --- AUTO-ADDED FIREBASE INIT ---
 import firebase_admin
 from firebase_admin import credentials, db
-import config
+from orbit_q import config
 
 try:
     if not firebase_admin._apps:
@@ -14,7 +14,7 @@ except Exception:
 import streamlit as st
 import pandas as pd
 from firebase_admin import db
-import config
+from orbit_q import config
 
 st.set_page_config(page_title="Performance Audit", layout="wide")
 st.title("🎯 AI Performance Audit")

@@ -1,7 +1,7 @@
 # --- AUTO-ADDED FIREBASE INIT ---
 import firebase_admin
 from firebase_admin import credentials, db
-import config
+from orbit_q import config
 
 try:
     if not firebase_admin._apps:

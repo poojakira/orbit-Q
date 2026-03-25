@@ -18,8 +18,13 @@ dependencies = [
     "mlflow>=2.0.0",
     "scikit-learn>=1.0.0",
     "pandas>=1.4.0",
-    "numpy>=1.22.0"
+    "numpy>=1.22.0",
+    "requests>=2.28.0"
 ]
+
+[project.scripts]
+orbit-q = "orbit_q.cli:main"
+
 
 [project.optional-dependencies]
 dev = [
@@ -29,6 +34,9 @@ dev = [
     "black>=23.0.0",
     "mypy>=1.0.0"
 ]
+gpu = [
+    "torch>=2.0.0"
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -36,10 +44,13 @@ python_files = "test_*.py"
 
 [tool.black]
 line-length = 120
-target-version = ['py39', 'py310']
+target-version = ['py39', 'py310', 'py311']
 
 [tool.mypy]
 python_version = "3.9"
 warn_return_any = true
 warn_unused_configs = true
 ignore_missing_imports = true
+
+[tool.setuptools.packages.find]
+where = ["src"]

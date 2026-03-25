@@ -1,5 +1,5 @@
 import pandas as pd
-import config
+from orbit_q import config
 
 class FeatureProcessor:
     @staticmethod

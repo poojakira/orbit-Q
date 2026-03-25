@@ -5,9 +5,9 @@ import pandas as pd
 from firebase_admin import db
 import mlflow
 
-from feature_processor import FeatureProcessor
-from ml_engine import AnomalyEngine
-import config
+from orbit_q.orchestrator.feature_processor import FeatureProcessor
+from orbit_q.engine.ml_engine import AnomalyEngine
+from orbit_q import config
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 

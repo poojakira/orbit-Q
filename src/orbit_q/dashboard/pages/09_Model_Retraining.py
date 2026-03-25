@@ -1,7 +1,7 @@
 # --- AUTO-ADDED FIREBASE INIT ---
 import firebase_admin
 from firebase_admin import credentials, db
-import config
+from orbit_q import config
 
 try:
     if not firebase_admin._apps:
@@ -13,7 +13,7 @@ except Exception:
 
 import streamlit as st
 import time
-from ml_orchestrator import MLOrchestrator
+from orbit_q.orchestrator.ml_orchestrator import MLOrchestrator
 
 st.set_page_config(page_title="Model Retraining", layout="wide")
 st.title("🔄 Pipeline & Retraining Triggers")
