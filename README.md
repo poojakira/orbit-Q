@@ -284,3 +284,11 @@ pytest tests/ --cov=src --cov-report=html       # with HTML coverage report
 | Drift-based retraining | Prevents model staleness under changing sensor calibrations |
 | `src/` layout | Prevents accidental uninstalled imports; pip-installable package best practice |
 | HMAC stream tokens | Stateless auth with TTL; no DB lookup needed for token validation |
+
+
+
+## Ownership
+
+- ML system and MLOps: **Pooja Kiran (@poojakira)**
+- Mission control, simulators, and dashboards: **Rhutvik Pachghare (@Rhutvik-Pachghare)**
+
