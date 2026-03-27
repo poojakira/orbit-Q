@@ -3,6 +3,7 @@ Temporal Anomaly Detection — LSTM Model
 Uses a sequence-to-sequence LSTM to learn nominal telemetry patterns over time.
 Reconstruction error on held-out sequences triggers anomaly labels.
 """
+
 import numpy as np
 from typing import Tuple
 
@@ -10,6 +11,7 @@ try:
     import torch
     import torch.nn as nn
     import torch.optim as optim
+
     TORCH_AVAILABLE = True
 except Exception as e:
     print(f"Warning: PyTorch unavailable ({e}) — LSTM disabled")
@@ -28,7 +30,7 @@ class LSTMAutoencoder(nn.Module if TORCH_AVAILABLE else object):
         self.hidden_dim = hidden_dim
         self.num_layers = num_layers
 
-    def forward(self, x):          # x: (batch, seq_len, features)
+    def forward(self, x):  # x: (batch, seq_len, features)
         _, (h, c) = self.encoder(x)
         # Repeat hidden state as decoder input for each timestep
         batch_size, seq_len = x.size(0), x.size(1)

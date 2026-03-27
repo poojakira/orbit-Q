@@ -20,16 +20,19 @@ st.title("⚙️ Satellite Hardware Diagnostics")
 
 col1, col2, col3 = st.columns(3)
 
+
 def plot_gauge(title, val, max_val, suffix=""):
-    fig = go.Figure(go.Indicator(
-        mode = "gauge+number",
-        value = val,
-        title = {'text': title},
-        gauge = {'axis': {'range': [None, max_val]},
-                 'bar': {'color': "#00a4e4"}}
-    ))
+    fig = go.Figure(
+        go.Indicator(
+            mode="gauge+number",
+            value=val,
+            title={"text": title},
+            gauge={"axis": {"range": [None, max_val]}, "bar": {"color": "#00a4e4"}},
+        )
+    )
     fig.update_layout(height=250, margin=dict(l=10, r=10, t=30, b=10))
     return fig
+
 
 with col1:
     st.plotly_chart(plot_gauge("CPU Load", random.randint(30, 60), 100, "%"), use_container_width=True)
@@ -40,8 +43,11 @@ with col3:
 
 st.divider()
 st.subheader("System Event Log")
-st.code("""
+st.code(
+    """
 [2026-02-23 18:00:01] SYSTEM: Solar array alignment adjusted.
 [2026-02-23 18:05:12] MLOPS: Inference engine memory cleared.
 [2026-02-23 18:10:44] SENSOR: Nominal ping from all faces (NORTH, SOUTH, EAST, WEST).
-""", language="text")
+""",
+    language="text",
+)

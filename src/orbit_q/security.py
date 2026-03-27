@@ -3,6 +3,7 @@ Security & Auth Hardening Module
 Provides token validation for telemetry streams, secrets management via
 environment variables, and an audit trail logger for key events.
 """
+
 import hashlib
 import hmac
 import logging
@@ -27,9 +28,7 @@ def generate_stream_token(satellite_id: str, timestamp: Optional[int] = None) ->
     """
     ts = timestamp or int(time.time())
     payload = f"{satellite_id}:{ts}"
-    sig = hmac.new(
-        _SIGNING_SECRET.encode(), payload.encode(), hashlib.sha256
-    ).hexdigest()
+    sig = hmac.new(_SIGNING_SECRET.encode(), payload.encode(), hashlib.sha256).hexdigest()
     return f"{payload}:{sig}"
 
 
@@ -50,9 +49,7 @@ def validate_stream_token(token: str) -> bool:
             return False
 
         payload = f"{satellite_id}:{ts_str}"
-        expected_sig = hmac.new(
-            _SIGNING_SECRET.encode(), payload.encode(), hashlib.sha256
-        ).hexdigest()
+        expected_sig = hmac.new(_SIGNING_SECRET.encode(), payload.encode(), hashlib.sha256).hexdigest()
         return hmac.compare_digest(expected_sig, provided_sig)
     except Exception as exc:
         log.error("Token validation error: %s", exc)

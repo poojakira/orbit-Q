@@ -8,6 +8,7 @@ orbit-q orchestrator   Run the ML orchestrator (fetches telemetry, trains ensemb
 orbit-q dashboard      Launch the Streamlit operator dashboard
 orbit-q benchmark      Run latency / throughput benchmark at configurable Hz
 """
+
 import argparse
 import sys
 import subprocess
@@ -75,6 +76,7 @@ def cmd_benchmark(args):
 
 def cmd_stress_test(args):
     import logging
+
     logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s")
     from orbit_q.simulator.multi_cubesat_stress import MultiCubeSatStressTest
 
@@ -95,6 +97,7 @@ def cmd_stress_test(args):
 def cmd_retrain(args):
     import logging
     import numpy as np
+
     logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s")
     from orbit_q.engine.ml_engine import AnomalyEngine
     from orbit_q.mlflow_tracking.retraining_pipeline import RetrainingPipeline

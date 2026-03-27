@@ -29,19 +29,19 @@ while True:
         if data:
             # Convert to DataFrame and transpose
             df = pd.DataFrame(data).T
-            
+
             # Convert unix timestamp to readable datetime
-            df['timestamp'] = pd.to_datetime(df['timestamp'], unit='s')
-            
+            df["timestamp"] = pd.to_datetime(df["timestamp"], unit="s")
+
             with placeholder.container():
                 # Plot the distance metric over time
-                st.line_chart(df.set_index('timestamp')['distance_cm'])
-                
+                st.line_chart(df.set_index("timestamp")["distance_cm"])
+
                 # THE FIX: Use st.table() instead of st.dataframe() to prevent React Error #185
                 st.table(df.tail(5))
-                
+
     except Exception as e:
         st.warning(f"Awaiting telemetry connection... (Error: {e})")
-    
+
     # Wait 2 seconds before pulling the next batch of data
     time.sleep(2)

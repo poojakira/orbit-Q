@@ -22,8 +22,8 @@ st.markdown("Detailed breakdown of model accuracy and real-time anomaly rates.")
 
 # Fetch system metrics
 metrics = db.reference("/SYSTEM_METRICS").get() or {}
-accuracy = metrics.get('accuracy', 'N/A')
-latency_gain = metrics.get('latency_gain', 'N/A')
+accuracy = metrics.get("accuracy", "N/A")
+latency_gain = metrics.get("latency_gain", "N/A")
 
 # Big KPI Row
 col1, col2, col3 = st.columns(3)
@@ -44,24 +44,29 @@ if raw_data and alerts:
     observed_rate = (total_alerts / total_packets) * 100
 
     c1, c2 = st.columns([1, 2])
-    
+
     with c1:
         st.write(f"**Total Packets Evaluated:** {total_packets}")
         st.write(f"**Total Anomalies Flagged:** {total_alerts}")
-        st.metric("Observed Anomaly Rate", f"{observed_rate:.2f}%", 
-                  delta=f"{(observed_rate - (config.CONTAMINATION * 100)):.2f}% vs Config", 
-                  delta_color="inverse")
-    
+        st.metric(
+            "Observed Anomaly Rate",
+            f"{observed_rate:.2f}%",
+            delta=f"{(observed_rate - (config.CONTAMINATION * 100)):.2f}% vs Config",
+            delta_color="inverse",
+        )
+
     with c2:
         # Show a progress bar comparing observed vs expected
         st.write("**Expected vs Observed Anomaly Rate**")
         st.progress(config.CONTAMINATION, text=f"Expected ({config.CONTAMINATION * 100}%)")
-        
+
         # Cap at 1.0 for progress bar safety
         safe_observed = min(observed_rate / 100, 1.0)
         st.progress(safe_observed, text=f"Observed ({observed_rate:.2f}%)")
-        
+
         if observed_rate > (config.CONTAMINATION * 100) * 1.5:
-            st.warning("⚠️ Observed anomaly rate is significantly higher than configured contamination. Consider retraining the model.")
+            st.warning(
+                "⚠️ Observed anomaly rate is significantly higher than configured contamination. Consider retraining the model."
+            )
 else:
     st.info("Gathering enough telemetry and alert data to calculate distribution...")

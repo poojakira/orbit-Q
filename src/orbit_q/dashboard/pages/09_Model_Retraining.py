@@ -32,8 +32,8 @@ st.divider()
 if st.button("🚀 Trigger Manual Retrain", type="primary"):
     with st.spinner("Fetching latest telemetry for training subset..."):
         df = orch.fetch_and_process()
-        time.sleep(1) # Simulated delay for UI feel
-        
+        time.sleep(1)  # Simulated delay for UI feel
+
     if df is not None and len(df) > 50:
         with st.spinner("Retraining Model & Logging to MLflow..."):
             # Trigger the actual train function

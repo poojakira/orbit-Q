@@ -25,28 +25,36 @@ raw_data = db.reference("/SENSOR_DATA").order_by_key().limit_to_last(100).get()
 
 if raw_data:
     df = pd.DataFrame(raw_data.values())
-    
+
     # Get the absolute latest reading for each face
-    latest_readings = df.sort_values('timestamp').groupby('face').tail(1)
-    
+    latest_readings = df.sort_values("timestamp").groupby("face").tail(1)
+
     # Fill in any missing faces just in case
-    faces = ["NORTH", "EAST", "SOUTH", "WEST"] # Ordered clockwise
+    faces = ["NORTH", "EAST", "SOUTH", "WEST"]  # Ordered clockwise
     radar_data = []
     for face in faces:
-        match = latest_readings[latest_readings['face'] == face]
-        dist = match['distance_cm'].values[0] if not match.empty else 0
+        match = latest_readings[latest_readings["face"] == face]
+        dist = match["distance_cm"].values[0] if not match.empty else 0
         radar_data.append({"face": face, "distance_cm": dist})
-        
+
     df_radar = pd.DataFrame(radar_data)
 
     # Build the Radar Chart
-    fig = px.line_polar(df_radar, r='distance_cm', theta='face', line_close=True,
-                        template="plotly_dark", markers=True, 
-                        title="Live Proximity Radar (cm)")
-    
-    fig.update_traces(fill='toself', line_color='#00a4e4')
+    fig = px.line_polar(
+        df_radar,
+        r="distance_cm",
+        theta="face",
+        line_close=True,
+        template="plotly_dark",
+        markers=True,
+        title="Live Proximity Radar (cm)",
+    )
+
+    fig.update_traces(fill="toself", line_color="#00a4e4")
     st.plotly_chart(fig, use_container_width=True)
-    
-    st.info("💡 **Operator Tip:** If the radar spikes heavily in one direction (e.g., >300cm), the system will automatically flag it as an anomaly on the Alert Command page.")
+
+    st.info(
+        "💡 **Operator Tip:** If the radar spikes heavily in one direction (e.g., >300cm), the system will automatically flag it as an anomaly on the Alert Command page."
+    )
 else:
     st.error("Awaiting telemetry stream to render radar...")

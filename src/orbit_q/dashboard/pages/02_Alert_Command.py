@@ -25,18 +25,14 @@ alerts = db.reference("/ML_ALERTS").order_by_key().limit_to_last(50).get()
 if alerts:
     # Convert Firebase dictionary to DataFrame
     df_alerts = pd.DataFrame(alerts.values())
-    df_alerts['timestamp'] = pd.to_datetime(df_alerts['timestamp'])
-    df_alerts = df_alerts.sort_values(by='timestamp', ascending=False)
-    
+    df_alerts["timestamp"] = pd.to_datetime(df_alerts["timestamp"])
+    df_alerts = df_alerts.sort_values(by="timestamp", ascending=False)
+
     # Highlight high-risk anomalies
     def color_risk(val):
-        color = '#ff4b4b' if val == -1 else 'white'
-        return f'color: {color}'
+        color = "#ff4b4b" if val == -1 else "white"
+        return f"color: {color}"
 
-    st.dataframe(
-        df_alerts.style.map(color_risk, subset=['anomaly']),
-        use_container_width=True,
-        height=500
-    )
+    st.dataframe(df_alerts.style.map(color_risk, subset=["anomaly"]), use_container_width=True, height=500)
 else:
     st.success("✅ No critical anomalies detected in the current mission window.")

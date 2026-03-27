@@ -4,6 +4,7 @@ Spawns N satellite simulators as concurrent threads, each pushing telemetry
 at a configurable rate. Measures aggregate throughput, anomaly detection
 latency, and system resource usage under high load.
 """
+
 import logging
 import os
 import random
@@ -86,8 +87,10 @@ class CubeSatSimulator(threading.Thread):
 
         log.info(
             "[%s] Done | packets=%d anomalies=%d errors=%d",
-            self.satellite_id, self.state.total_packets,
-            self.state.anomaly_count, self.state.errors
+            self.satellite_id,
+            self.state.total_packets,
+            self.state.anomaly_count,
+            self.state.errors,
         )
 
 
@@ -138,8 +141,7 @@ class MultiCubeSatStressTest:
         consumer.start()
 
         log.info(
-            "🛰️  Stress test | %d satellites × %d Hz × %.0fs",
-            self.n_satellites, self.hz_per_satellite, self.duration_s
+            "🛰️  Stress test | %d satellites × %d Hz × %.0fs", self.n_satellites, self.hz_per_satellite, self.duration_s
         )
         t0 = time.time()
 
@@ -175,6 +177,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s")
 
     import sys
+
     n = int(sys.argv[1]) if len(sys.argv) > 1 else 10
     hz = int(sys.argv[2]) if len(sys.argv) > 2 else 50
     duration = float(sys.argv[3]) if len(sys.argv) > 3 else 10.0

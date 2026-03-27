@@ -2,6 +2,7 @@
 Tests for the security module (token validation, audit trail)
 and the multi-CubeSat stress test simulator.
 """
+
 import pytest
 import time
 import os
@@ -12,8 +13,8 @@ from orbit_q.security import (
 )
 from orbit_q.simulator.multi_cubesat_stress import MultiCubeSatStressTest
 
-
 # ── Security Tests ─────────────────────────────────────────────────────────────
+
 
 class TestTokenValidation:
     def test_valid_token(self):
@@ -40,6 +41,7 @@ class TestAuditTrail:
     def test_audit_writes_to_log(self, tmp_path):
         log_path = str(tmp_path / "test_audit.log")
         import orbit_q.security as sec_module
+
         original = sec_module._AUDIT_LOG_PATH
         sec_module._AUDIT_LOG_PATH = log_path
 
@@ -54,6 +56,7 @@ class TestAuditTrail:
 
 
 # ── Multi-CubeSat Stress Test ──────────────────────────────────────────────────
+
 
 class TestMultiCubeSatStressTest:
     def test_stress_test_runs_and_reports(self):

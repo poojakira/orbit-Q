@@ -25,11 +25,14 @@ col3.metric("Model Weights (.pkl)", model_status)
 st.divider()
 
 st.subheader("System Environment Variables")
-st.code("""
+st.code(
+    """
 PYTHONUNBUFFERED=1
 FIREBASE_DB_URL=https://cubesat-5403b-default-rtdb.asia-southeast1.firebasedatabase.app/
 MLFLOW_TRACKING_URI=sqlite:///mlflow.db
 ENVIRONMENT=Production
-""", language="bash")
+""",
+    language="bash",
+)
 
 st.success("All microservices and endpoints are fully operational.")

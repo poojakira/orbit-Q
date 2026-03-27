@@ -21,16 +21,21 @@ st.title("⚡ Inference Speed & Profiling")
 st.markdown("Track the response time of the Anomaly Engine against the 2.0s legacy baseline.")
 
 metrics = db.reference("/SYSTEM_METRICS").get() or {}
-latency_gain = metrics.get('latency_gain', '0.0%')
+latency_gain = metrics.get("latency_gain", "0.0%")
 
 st.metric("Current Latency Optimization", latency_gain, delta="Target: >40.0%")
 
 st.subheader("Inference Engine Profile")
 # Mocking a profiling table since the orchestrator runs locally
 profile_data = {
-    "Component": ["Data Fetch (Firebase)", "Feature Engineering (Rolling Windows)", "Model Predict (Isolation Forest)", "Logging (MLflow)"],
+    "Component": [
+        "Data Fetch (Firebase)",
+        "Feature Engineering (Rolling Windows)",
+        "Model Predict (Isolation Forest)",
+        "Logging (MLflow)",
+    ],
     "Avg Time (ms)": [120, 15, 8, 45],
-    "Status": ["Nominal", "Optimized", "Highly Optimized", "Nominal"]
+    "Status": ["Nominal", "Optimized", "Highly Optimized", "Nominal"],
 }
 
 df_profile = pd.DataFrame(profile_data)
