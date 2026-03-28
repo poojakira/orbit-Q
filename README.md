@@ -1,188 +1,105 @@
-# 🛰️ Orbit-Q — Distributed ML Satellite Telemetry Platform
+# Orbit-Q — Distributed ML Satellite Telemetry Platform
 
 **Production-grade, GPU-accelerated anomaly detection infrastructure for satellite operations**
 
-![CI](https://github.com/poojakira/orbit-Q/actions/workflows/ci.yml/badge.svg)
-![Python 3.9+](https://img.shields.io/badge/Python-3.9%2B-blue)
-![MLflow](https://img.shields.io/badge/MLOps-MLflow-0194E2)
-![Tests](https://img.shields.io/badge/tests-11%20passed-brightgreen)
-![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
+[![CI](https://github.com/poojakira/orbit-Q/actions/workflows/ci.yml/badge.svg)](https://github.com/poojakira/orbit-Q/actions)
+[![Python 3.9+](https://img.shields.io/badge/Python-3.9%2B-blue)]()
+[![MLflow](https://img.shields.io/badge/MLOps-MLflow-0194E2)]()
+[![Tests](https://img.shields.io/badge/tests-11%20passed-brightgreen)]()
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)]()
 
 ---
 
-## 📖 Overview
+## 1. Overview
 
-Orbit-Q is a **systems-level ML infrastructure platform** specifically designed for satellite telemetry anomaly detection. Engineered for production-scale reliability, it provides an end-to-end pipeline from high-frequency telemetry ingestion to multi-model ensemble detection and operator-facing command & control dashboards.
-
-## ✨ Key Features
-
-- **🚀 Performance**: GPU-accelerated ensemble detection with Triton CUDA kernels for nanosecond-level score fusion.
-- **🏗️ Resilient Ingestion**: High-throughput REST/gRPC endpoints with automated event-schema mapping and fallback mechanisms.
-- **🧠 Advanced ML**: Multi-model ensemble combining `IsolationForest` (global outliers), PyTorch `Autoencoder` (feature manifold), and `LSTM` (temporal patterns).
-- **♻️ MLOps Lifecycle**: Automated drift-detection and retraining pipelines with full MLflow lineage tracking.
-- **🛡️ Mission Security**: HMAC-SHA256 stream token authentication with comprehensive audit trail logging.
-- **📊 Command Center**: A 10-page Streamlit suite for live telemetry, mission diagnostics, and performance auditing.
+Orbit-Q is a systems-level ML infrastructure platform specifically designed for satellite telemetry anomaly detection. Engineered for production-scale reliability, it provides an end-to-end pipeline from high-frequency telemetry ingestion to multi-model ensemble detection and operator-facing command & control dashboards.
 
 ---
 
-## 🏗️ Architecture
+## 2. Key Features
+
+- **Performance**: GPU-accelerated ensemble detection with Triton CUDA kernels for nanosecond-level score fusion
+- **Resilient Ingestion**: High-throughput REST/gRPC endpoints with automated event-schema mapping and fallback mechanisms
+- **Advanced ML**: Multi-model ensemble combining IsolationForest (global outliers), PyTorch Autoencoder (feature manifold), and LSTM (temporal patterns)
+- **MLOps Lifecycle**: Automated drift-detection and retraining pipelines with full MLflow lineage tracking
+- **Mission Security**: HMAC-SHA256 stream token authentication with comprehensive audit trail logging
+- **Command Center**: A 10-page Streamlit suite for live telemetry, mission diagnostics, and performance auditing
+
+---
+
+## 3. Architecture
 
 Orbit-Q follows a decoupled, modular architecture designed for high availability and low latency.
 
-```mermaid
-graph TD
-    subgraph "Satellite Simulator Layer"
-        SIM[Multi-Sat Simulator] -->|Telemetry Stream| ING[Ingestion API]
-        STRESS[Stress Test Engine] -->|High Rate| ING
-    end
+### Package Structure
 
-    subgraph "Ingestion & Processing"
-        ING -->|Normalize| ORCH[ML Orchestrator]
-        ORCH -->|Feature Extraction| PROC[Feature Processor]
-    end
-
-    subgraph "Anomaly Engine Ensemble"
-        PROC --> IF[IsolationForest - cuML/GPU]
-        PROC --> AE[Autoencoder - PyTorch]
-        PROC --> LSTM[LSTM Temporal Detector]
-        IF & AE & LSTM --> FUSE[Triton Score Fusion Kernel]
-    end
-
-    subgraph "MLOps & Control"
-        FUSE --> ALERTS[Alerts & Audit Trail]
-        FUSE --> DASH[Streamlit Dashboard]
-        ALERTS --> MLF[MLflow Tracking]
-        MLF --> RETRAIN[Auto-Retraining Pipeline]
-    end
-```
-
-### Detailed Package Structure
-
-- [`src/orbit_q/`](file:///home/rhutvik/orbit-Q/src/orbit_q)
-    - [`cli.py`](file:///home/rhutvik/orbit-Q/src/orbit_q/cli.py): Main entry point with 6 mission-critical commands.
-    - [`engine/`](file:///home/rhutvik/orbit-Q/src/orbit_q/engine): Core ML ensemble and custom CUDA kernels for score fusion.
-    - [`ingestion/`](file:///home/rhutvik/orbit-Q/src/orbit_q/ingestion): High-frequency telemetry entry point (REST/gRPC).
-    - [`orchestrator/`](file:///home/rhutvik/orbit-Q/src/orbit_q/orchestrator): Central rules engine and stream processing coordinator.
-    - [`dashboard/`](file:///home/rhutvik/orbit-Q/src/orbit_q/dashboard): Full-stack Streamlit C2 interface.
-    - [`mlflow_tracking/`](file:///home/rhutvik/orbit-Q/src/orbit_q/mlflow_tracking): Experiment lineage and automated model maintenance.
-    - [`simulator/`](file:///home/rhutvik/orbit-Q/src/orbit_q/simulator): Fault-injection telemetry generators for testing.
+- `src/orbit_q/`
+  - `cli.py`: Main entry point with 6 mission-critical commands
+  - `engine/`: Core ML ensemble and custom CUDA kernels for score fusion
+  - `ingestion/`: High-frequency telemetry entry point (REST/gRPC)
+  - `orchestrator/`: Central rules engine and stream processing coordinator
+  - `dashboard/`: Full-stack Streamlit C2 interface
+  - `mlflow_tracking/`: Experiment lineage and automated model maintenance
+  - `simulator/`: Fault-injection telemetry generators for testing
 
 ---
 
-## 🚀 Quick Start
+## 4. Quick Start
 
 ### Prerequisites
+
 - Python 3.9+
 - CUDA 11.8+ (Required for GPU acceleration features)
 - Virtual Environment (Recommended)
 
 ### Installation
 
-1. **Clone and Setup**:
-   ```bash
-   git clone https://github.com/poojakira/orbit-Q.git
-   cd orbit-Q
-   python -m venv .venv
-   source .venv/bin/activate  # Linux/macOS
-   # .venv\Scripts\activate  # Windows
-   ```
-
-2. **Install Dependencies**:
-   ```bash
-   pip install -e .          # Standard installation
-   pip install -e ".[gpu]"   # Enable GPU acceleration (requires PyTorch/CUDA)
-   pip install -e ".[dev]"   # Development tools (testing, linting)
-   ```
+```bash
+git clone https://github.com/poojakira/orbit-Q.git
+cd orbit-Q
+python -m venv .venv
+source .venv/bin/activate  # Linux/macOS
+# .venv\Scripts\activate  # Windows
+pip install -e .            # Standard installation
+pip install -e ".[gpu]"     # Enable GPU acceleration
+pip install -e ".[dev]"     # Development tools
+```
 
 ### Configuration
-Create a `.env` file or export environment variables for mission-specific settings:
+
 ```bash
-# Security (Required for authenticated streams)
 ORBIT_Q_SIGNING_SECRET=your-secure-secret-key
-
-# MLflow (Database tracking)
 MLFLOW_TRACKING_URI=sqlite:///mlruns/orbit_q.db
-
-# Optional: External Integrations
 FIREBASE_DB_URL=https://your-project.firebaseio.com
-SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
 ```
 
 ---
 
-## 💻 CLI Usage
-
-The `orbit-q` command provides a unified interface for all project modules:
+## 5. CLI Commands
 
 | Command | Description |
 |---|---|
-| `orbit-q simulator` | Start a single-satellite mock telemetry stream. |
-| `orbit-q orchestrator`| Run the ML pipeline and rule-dispatch daemon. |
-| `orbit-q dashboard` | Launch the Streamlit command center (default :8501). |
-| `orbit-q benchmark` | Execute a high-rate throughput and latency stress test. |
-| `orbit-q stress-test`| Simulate multiple concurrent satellite streams. |
-| `orbit-q retrain` | Manually trigger the ensemble retraining pipeline. |
+| `orbit-q simulator` | Start a single-satellite mock telemetry stream |
+| `orbit-q orchestrator` | Run the ML pipeline and rule-dispatch daemon |
+| `orbit-q dashboard` | Launch the Streamlit command center (default :8501) |
+| `orbit-q benchmark` | Execute a high-rate throughput and latency stress test |
+| `orbit-q stress-test` | Simulate multiple concurrent satellite streams |
+| `orbit-q retrain` | Manually trigger the ensemble retraining pipeline |
 
 ---
 
-## 🛡️ Reliability & Security
+## 6. ML Ensemble
 
-Orbit-Q is built to handle the harsh realities of space-ground communication:
-
-- **Auth**: Stateless HMAC stream tokens with defined TTL (time-to-live).
-- **Graceful Fallback**: Automatic CPU fallback if cuML/GPU components are unavailable.
-- **Resilient Data**: Logic to handle missing packets, latency jitter, and corrupted (NaN) sensor inputs.
-- **Audit**: Every detected anomaly and system command is recorded in a tamper-proof audit trail.
-
----
-
-## 🧪 Testing
-
-We maintain a strict testing regimen with high coverage requirements:
-
-```bash
-pytest tests/ -v                                # Run core test suites
-pytest tests/ --cov=src --cov-report=html       # Generate coverage report
-```
-
-### Verified Test Suites
-- **ML Engine**: Ensemble initialization, cross-validation, and prediction accuracy.
-- **Simulator**: Packet schema integrity and fault-injection accuracy.
-- **Security**: HMAC validation, token expiry, and unauthorized access prevention.
+| Model | Type | Role |
+|---|---|---|
+| **IsolationForest** | Tree ensemble | Global outlier detection |
+| **PyTorch Autoencoder** | Neural network | Feature manifold learning |
+| **LSTM** | Recurrent network | Temporal pattern modeling |
+| **Triton Fusion Kernel** | CUDA kernel | Nanosecond-level score combining |
 
 ---
 
-## 🤝 Contributing
-
-Contributions to Orbit-Q are welcome! Please follow these steps:
-1. Fork the repository.
-2. Create a feature branch (`git checkout -b feature/amazing-feature`).
-3. Ensure all tests pass (`pytest`).
-4. Submit a Pull Request with a detailed description of your changes.
-
----
-
-## 📜 License
-
-Distributed under the **MIT License**. See [`LICENSE`](file:///home/rhutvik/orbit-Q/LICENSE) for more information.
-
-## 👥 Acknowledgments
-
-Developed and maintained by:
-- **Pooja Kiran (@poojakira)** - Core ML architecture, MLOps, and score fusion kernels.
-- **Rhutvik Pachghare (@Rhutvik-Pachghare)** - Distributed orchestration, simulation engines, and C2 dashboard.
-ock mode |
-| Missing packet | Simulator skips + logs warning; orchestrator handles `None` |
-| Delayed packet | Timestamps backdated; orchestrator filters stale |
-| Corrupted data (`NaN`, -9999) | Preprocessor normalizes/drops; no crash |
-| PyTorch DLL failure (Windows) | `TORCH_AVAILABLE` guard; AE disabled gracefully |
-| Ingestion Overflow | gRPC buffering + load balancing (REST fallback) |
-| Missing credentials | Firebase/MLflow init in try/except; logs warning |
-| Token expiry/tamper | HMAC validates + TTL enforced; audit event written |
-
----
-
-## 📐 Design Decisions
+## 7. Design Decisions
 
 | Decision | Rationale |
 |---|---|
@@ -191,30 +108,79 @@ ock mode |
 | Triton kernel for fusion | Avoids Python overhead for high-frequency (200 Hz+) score combining |
 | DDP via `mp.spawn` | SLURM-compatible; no dependency on Horovod/Ray for standard multi-GPU |
 | Drift-based retraining | Prevents model staleness under changing sensor calibrations |
-| `src/` layout | Prevents accidental uninstalled imports; pip-installable package best practice |
 | HMAC stream tokens | Stateless auth with TTL; no DB lookup needed for token validation |
 
 ---
 
-## 🎮 Operator Dashboard (10-Page Suite)
+## 8. Security & Reliability
 
-The Orbit-Q command center is powered by an extensive Streamlit interface organized into specialized mission control modules:
+- **Auth**: Stateless HMAC-SHA256 stream tokens with defined TTL (time-to-live)
+- **Graceful Fallback**: Automatic CPU fallback if cuML/GPU components are unavailable
+- **Resilient Data**: Logic to handle missing packets, latency jitter, and corrupted (NaN) sensor inputs
+- **Audit**: Every detected anomaly and system command is recorded in a tamper-proof audit trail
 
-1.  **01 Live Telemetry**: High-frequency streaming charts for all satellite subsystems.
-2.  **02 Alert & Command**: Real-time anomaly log with interactive operator intervention tools.
-3.  **03 Hardware Diagnostics**: Deep-dive into thermal, electrical, and mechanical telemetry.
-4.  **04 Orbital Tracking**: TLE-based position visualization and signal lock status.
-5.  **05 Raw Telemetry Logs**: Searchable database of all historical telemetry packets.
-6.  **06 Performance Audit**: **MLOps compliance** tracker; accuracy vs. contamination audit.
-7.  **07 Inference Latency**: Microsecond-level tracking of GPU engine performance.
-8.  **08 MLflow Lineage**: Full experiment lineage; tracks every mission pulse and model run.
-9.  **09 Model Retraining**: Manual trigger interface for the ensemble retraining pipeline.
-10. **10 Endpoint Health**: Real-time status of the ingestion API and downstream services.
+---
 
+## 9. Operator Dashboard (10-Page Suite)
 
+1. **Live Telemetry**: High-frequency streaming charts for all satellite subsystems
+2. **Alert & Command**: Real-time anomaly log with interactive operator intervention tools
+3. **Hardware Diagnostics**: Deep-dive into thermal, electrical, and mechanical telemetry
+4. **Orbital Tracking**: TLE-based position visualization and signal lock status
+5. **Raw Telemetry Logs**: Searchable database of all historical telemetry packets
+6. **Performance Audit**: MLOps compliance tracker; accuracy vs. contamination audit
+7. **Inference Latency**: Microsecond-level tracking of GPU engine performance
+8. **MLflow Lineage**: Full experiment lineage; tracks every mission pulse and model run
+9. **Model Retraining**: Manual trigger interface for the ensemble retraining pipeline
+10. **Endpoint Health**: Real-time status of the ingestion API and downstream services
 
-## Ownership
+---
 
-- ML system and MLOps: **Pooja Kiran (@poojakira)**
-- Mission control, simulators, and dashboards: **Rhutvik Pachghare (@Rhutvik-Pachghare)**
+## 10. Testing
 
+```bash
+pytest tests/ -v                         # Run core test suites
+pytest tests/ --cov=src --cov-report=html  # Generate coverage report
+```
+
+### Verified Test Suites
+
+- **ML Engine**: Ensemble initialization, cross-validation, and prediction accuracy
+- **Simulator**: Packet schema integrity and fault-injection accuracy
+- **Security**: HMAC validation, token expiry, and unauthorized access prevention
+
+---
+
+## 11. License
+
+Distributed under the **MIT License**. See `LICENSE` for more information.
+
+---
+
+## 12. Team Contributions
+
+### Pooja Kiran — Lead ML Systems Engineer & Core Architect
+
+| # | Contribution Area | Details | Quantified Impact |
+|---|---|---|---|
+| 1 | Multi-Model ML Ensemble Engine | Designed and implemented 3-model ensemble: IsolationForest (global outliers), PyTorch Autoencoder (feature manifold), LSTM (temporal patterns) | 3 models fused; ensemble handles 200 Hz+ satellite telemetry streams |
+| 2 | Custom Triton CUDA Fusion Kernel | Engineered CUDA kernel (`engine/`) for nanosecond-level score fusion across all 3 ensemble models | Nanosecond-level fusion latency; avoids Python GIL overhead at high frequency |
+| 3 | cuML / CPU Graceful Fallback | Implemented automatic fallback from cuML GPU to sklearn CPU when CUDA unavailable | 100% portability across GPU and CPU environments |
+| 4 | DDP Multi-GPU Training | Implemented PyTorch Distributed Data Parallel (DDP) via `mp.spawn` for SLURM-compatible multi-GPU training | SLURM-compatible; no Horovod/Ray dependency |
+| 5 | MLflow Experiment Lineage | Built full MLflow tracking system for every model training run, drift event, and retraining trigger | Full lineage tracking; automated retraining at 0.1 KL-divergence drift threshold |
+| 6 | Drift Detection & Auto-Retraining | Implemented statistical drift detection pipeline with KL-divergence monitoring and auto-retrain triggers | Prevents model staleness under changing sensor calibrations |
+| 7 | HMAC-SHA256 Stream Authentication | Designed stateless HMAC stream token authentication with defined TTL and comprehensive audit logging | Stateless auth; every anomaly and command recorded in tamper-proof audit trail |
+
+### Rhutvik Pachghare — Distributed Systems & Mission Operations Engineer
+
+| # | Contribution Area | Details | Quantified Impact |
+|---|---|---|---|
+| 1 | Mission Simulation Engine | Built fault-injection telemetry simulator (`simulator/`) generating realistic satellite sensor streams with configurable anomaly injection | Supports multiple concurrent satellite streams via `orbit-q stress-test` |
+| 2 | Distributed Orchestrator | Engineered the central rules engine and stream processing coordinator (`orchestrator/`) managing the ML pipeline daemon | Real-time dispatch; handles missing packets, latency jitter, and NaN sensor inputs |
+| 3 | 10-Page Streamlit C2 Dashboard | Developed the full-stack Streamlit Command & Control interface across 10 specialized mission control modules | 10 pages: live telemetry, alert/command, diagnostics, orbital tracking, logs, audit, latency, MLflow, retraining, endpoint health |
+| 4 | REST/gRPC Ingestion Layer | Implemented high-throughput telemetry ingestion endpoints (`ingestion/`) with automated event-schema mapping | Supports 200 Hz+ ingestion rate with gRPC buffering + REST load balancing fallback |
+| 5 | Black Formatting & Code Quality | Applied Black formatting and standardized code style across the codebase; committed as `Apply black formatting from friend` | Uniform code style across all modules |
+
+---
+
+**License**: MIT | **Platform**: Python 3.9+ | **GPU**: CUDA 11.8+
