@@ -22,16 +22,10 @@ if TORCH_AVAILABLE:
     class LSTMAutoencoder(nn.Module):  # type: ignore[misc]
         """Sequence-to-sequence LSTM for temporal anomaly detection."""
 
-        def __init__(
-            self, input_dim: int = 5, hidden_dim: int = 32, num_layers: int = 2
-        ):
+        def __init__(self, input_dim: int = 5, hidden_dim: int = 32, num_layers: int = 2):
             super().__init__()
-            self.encoder = nn.LSTM(
-                input_dim, hidden_dim, num_layers, batch_first=True
-            )
-            self.decoder = nn.LSTM(
-                hidden_dim, input_dim, num_layers, batch_first=True
-            )
+            self.encoder = nn.LSTM(input_dim, hidden_dim, num_layers, batch_first=True)
+            self.decoder = nn.LSTM(hidden_dim, input_dim, num_layers, batch_first=True)
             self.hidden_dim = hidden_dim
             self.num_layers = num_layers
 
