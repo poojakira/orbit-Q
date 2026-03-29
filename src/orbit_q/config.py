@@ -18,8 +18,12 @@ SERVICE_ACCOUNT: str = os.getenv("SERVICE_ACCOUNT_PATH", "service_account.json")
 
 # ML Governance
 MLFLOW_URI: str = os.getenv("MLFLOW_TRACKING_URI", "sqlite:///mlflow.db")
-EXPERIMENT_NAME: str = os.getenv("MLFLOW_EXPERIMENT_NAME", "CubeSat_3D_Anomaly_Engine")
-MODEL_PATH: str = os.getenv("MODEL_PATH", "models/orbit_q_ensemble_latest.pkl")
+EXPERIMENT_NAME: str = os.getenv(
+    "MLFLOW_EXPERIMENT_NAME", "CubeSat_3D_Anomaly_Engine"
+)
+MODEL_PATH: str = os.getenv(
+    "MODEL_PATH", "models/orbit_q_ensemble_latest.pkl"
+)
 
 # Hyperparameters
 CONTAMINATION: float = float(os.getenv("CONTAMINATION", "0.05"))
