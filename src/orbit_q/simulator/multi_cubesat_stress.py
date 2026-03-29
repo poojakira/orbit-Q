@@ -9,6 +9,7 @@ import logging
 import os
 import random
 import threading
+import queue
 import time
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
@@ -123,7 +124,7 @@ class MultiCubeSatStressTest:
                 break
 
     def run(self) -> Dict:
-        import queue
+    
 
         q: queue.Queue = queue.Queue(maxsize=50_000)
 
