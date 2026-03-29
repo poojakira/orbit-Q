@@ -57,6 +57,7 @@ class LSTMTemporalDetector:
         self.seq_len = seq_len
         self.input_dim = input_dim
         self.epochs = epochs
+                self.lr = lr
         self.threshold_percentile = threshold_percentile
         self.threshold = 0.0
 
@@ -86,7 +87,7 @@ class LSTMTemporalDetector:
         X_t = torch.tensor(seqs).to(self.device)
 
         criterion = nn.MSELoss()
-        optimizer = optim.Adam(self.model.parameters(), lr=1e-3)
+        optimizer = optim.Adam(self.model.parameters(),lr=self.lr)
 
         self.model.train()
         for epoch in range(self.epochs):
