@@ -1,9 +1,8 @@
 """
-Temporal Anomaly Detection — LSTM Model
+Temporal Anomaly Detection - LSTM Model
 Uses a sequence-to-sequence LSTM to learn nominal telemetry patterns over time.
 Reconstruction error on held-out sequences triggers anomaly labels.
 """
-
 import numpy as np
 from typing import Tuple
 
@@ -14,29 +13,42 @@ try:
 
     TORCH_AVAILABLE = True
 except Exception as e:
-    print(f"Warning: PyTorch unavailable ({e}) — LSTM disabled")
+    print(f"Warning: PyTorch unavailable ({e}) - LSTM disabled")
     TORCH_AVAILABLE = False
 
 
-class LSTMAutoencoder(nn.Module if TORCH_AVAILABLE else object):
-    """Sequence-to-sequence LSTM for temporal anomaly detection."""
+if TORCH_AVAILABLE:
 
-    def __init__(self, input_dim: int = 5, hidden_dim: int = 32, num_layers: int = 2):
-        if not TORCH_AVAILABLE:
-            return
-        super().__init__()
-        self.encoder = nn.LSTM(input_dim, hidden_dim, num_layers, batch_first=True)
-        self.decoder = nn.LSTM(hidden_dim, input_dim, num_layers, batch_first=True)
-        self.hidden_dim = hidden_dim
-        self.num_layers = num_layers
+    class LSTMAutoencoder(nn.Module):  # type: ignore[misc]
+        """Sequence-to-sequence LSTM for temporal anomaly detection."""
 
-    def forward(self, x):  # x: (batch, seq_len, features)
-        _, (h, c) = self.encoder(x)
-        # Repeat hidden state as decoder input for each timestep
-        batch_size, seq_len = x.size(0), x.size(1)
-        decoder_input = h[-1].unsqueeze(1).repeat(1, seq_len, 1)
-        out, _ = self.decoder(decoder_input)
-        return out
+        def __init__(
+            self, input_dim: int = 5, hidden_dim: int = 32, num_layers: int = 2
+        ):
+            super().__init__()
+            self.encoder = nn.LSTM(
+                input_dim, hidden_dim, num_layers, batch_first=True
+            )
+            self.decoder = nn.LSTM(
+                hidden_dim, input_dim, num_layers, batch_first=True
+            )
+            self.hidden_dim = hidden_dim
+            self.num_layers = num_layers
+
+        def forward(self, x):  # x: (batch, seq_len, features)
+            _, (h, c) = self.encoder(x)
+            batch_size, seq_len = x.size(0), x.size(1)
+            decoder_input = h[-1].unsqueeze(1).repeat(1, seq_len, 1)
+            out, _ = self.decoder(decoder_input)
+            return out
+
+else:
+
+    class LSTMAutoencoder(object):  # type: ignore[no-redef]
+        """Stub when PyTorch is unavailable."""
+
+        def __init__(self, *args, **kwargs):
+            pass
 
 
 class LSTMTemporalDetector:
@@ -57,10 +69,9 @@ class LSTMTemporalDetector:
         self.seq_len = seq_len
         self.input_dim = input_dim
         self.epochs = epochs
-                self.lr = lr
+        self.lr = lr
         self.threshold_percentile = threshold_percentile
         self.threshold = 0.0
-
         if TORCH_AVAILABLE:
             self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
             self.model = LSTMAutoencoder(input_dim, hidden_dim).to(self.device)
@@ -68,27 +79,22 @@ class LSTMTemporalDetector:
             self.device = None
             self.model = None
 
-    # ── Helpers ───────────────────────────────────────────────────────────────
-
+    # --- Helpers ---
     def _to_sequences(self, X: np.ndarray) -> np.ndarray:
-        """Slide a window of seq_len over X → (n_windows, seq_len, features)."""
+        """Slide a window of seq_len over X to get (n_windows, seq_len, features)."""
         seqs = []
         for i in range(len(X) - self.seq_len + 1):
             seqs.append(X[i : i + self.seq_len])
         return np.array(seqs, dtype=np.float32)
 
-    # ── Public API ─────────────────────────────────────────────────────────────
-
+    # --- Public API ---
     def fit(self, X: np.ndarray) -> "LSTMTemporalDetector":
         if not TORCH_AVAILABLE:
             return self
-
         seqs = self._to_sequences(X)
         X_t = torch.tensor(seqs).to(self.device)
-
         criterion = nn.MSELoss()
-        optimizer = optim.Adam(self.model.parameters(),lr=self.lr)
-
+        optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
         self.model.train()
         for epoch in range(self.epochs):
             optimizer.zero_grad()
@@ -96,14 +102,11 @@ class LSTMTemporalDetector:
             loss = criterion(recon, X_t)
             loss.backward()
             optimizer.step()
-
-        # Set threshold from training reconstruction errors
         self.model.eval()
         with torch.no_grad():
             recon = self.model(X_t)
             err = torch.mean((X_t - recon) ** 2, dim=(1, 2)).cpu().numpy()
-            self.threshold = float(np.percentile(err, self.threshold_percentile))
-
+        self.threshold = float(np.percentile(err, self.threshold_percentile))
         return self
 
     def decision_function(self, X: np.ndarray) -> np.ndarray:
@@ -116,7 +119,6 @@ class LSTMTemporalDetector:
         with torch.no_grad():
             recon = self.model(X_t)
             err = torch.mean((X_t - recon) ** 2, dim=(1, 2)).cpu().numpy()
-        # Pad to match original length
         pad = np.full(self.seq_len - 1, err[0])
         return np.concatenate([pad, err])
 
