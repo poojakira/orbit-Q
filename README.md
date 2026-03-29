@@ -19,7 +19,18 @@
 Orbit-Q is a **systems-level ML infrastructure platform** specifically designed for satellite telemetry anomaly detection. Engineered for production-scale reliability, it provides an end-to-end pipeline from high-frequency telemetry ingestion to multi-model ensemble detection and operator-facing command & control dashboards.
 
 ---
+## Project Background
 
+orbit-Q started as an exploratory project to prototype a CubeSat-oriented health monitoring stack with realistic telemetry constraints.  
+In 2026, I turned those early notebooks into a structured repository that:
+
+- Ingests and processes satellite-style sensor and status streams
+- Runs anomaly detection over health metrics and communication channels
+- Integrates with Firebase and MLOps tooling for near-real-time monitoring
+
+It is designed as a lightweight but realistic template for small-satellite health pipelines.
+
+---
 ## 2. 👥 Team Contributions
 
 ### 2.1 Pooja Kiran - Lead ML Systems Architect
