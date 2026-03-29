@@ -1,5 +1,5 @@
 import numpy as np
-from typing import Tuple
+from typing import Optional, Tuple
 
 try:
     import torch
@@ -12,11 +12,32 @@ except Exception as e:
     TORCH_AVAILABLE = False
 
     # Mock classes for import safety
-    class nn:
+    class _MockNN:
         Module = object
 
+        class Sequential:
+            pass
 
-class PyTorchAutoencoder(nn.Module):
+        class Linear:
+            pass
+
+        class ReLU:
+            pass
+
+        class Sigmoid:
+            pass
+
+        class MSELoss:
+            pass
+
+    nn = _MockNN  # type: ignore[assignment,misc]
+
+    class optim:  # type: ignore[no-redef]
+        class Adam:
+            pass
+
+
+class PyTorchAutoencoder(nn.Module):  # type: ignore[misc]
     def __init__(self, input_dim: int, hidden_dim: int = 16, latent_dim: int = 8):
         super(PyTorchAutoencoder, self).__init__()
         self.encoder = nn.Sequential(
@@ -29,7 +50,7 @@ class PyTorchAutoencoder(nn.Module):
             nn.Sigmoid(),  # assuming normalized input
         )
 
-    def forward(self, x):
+    def forward(self, x):  # type: ignore[override]
         encoded = self.encoder(x)
         decoded = self.decoder(encoded)
         return decoded
@@ -40,9 +61,8 @@ class AutoencoderAnomalyDetector:
 
     def __init__(self, input_dim: int = 3, epochs: int = 10, lr: float = 1e-3, threshold_percentile: float = 95.0):
         if not TORCH_AVAILABLE:
-            self.model = None
+            self.model: Optional[PyTorchAutoencoder] = None
             return
-
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model = PyTorchAutoencoder(input_dim=input_dim).to(self.device)
         self.epochs = epochs
@@ -50,14 +70,12 @@ class AutoencoderAnomalyDetector:
         self.threshold_percentile = threshold_percentile
         self.threshold = 0.0
 
-    def fit(self, X: np.ndarray):
-        if not TORCH_AVAILABLE:
+    def fit(self, X: np.ndarray) -> "AutoencoderAnomalyDetector":
+        if not TORCH_AVAILABLE or self.model is None:
             return self
-
         X_tensor = torch.tensor(X, dtype=torch.float32).to(self.device)
         criterion = nn.MSELoss()
         optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
-
         self.model.train()
         for epoch in range(self.epochs):
             optimizer.zero_grad()
@@ -65,31 +83,27 @@ class AutoencoderAnomalyDetector:
             loss = criterion(outputs, X_tensor)
             loss.backward()
             optimizer.step()
-
         # Calculate reconstruction error to set the threshold
         self.model.eval()
         with torch.no_grad():
             reconstructed = self.model(X_tensor)
             mse = torch.mean((X_tensor - reconstructed) ** 2, dim=1).cpu().numpy()
-            self.threshold = float(np.percentile(mse, self.threshold_percentile))
-
+        self.threshold = float(np.percentile(mse, self.threshold_percentile))
         return self
 
     def predict(self, X: np.ndarray) -> np.ndarray:
         if not TORCH_AVAILABLE:
             return np.ones(len(X))
-
         scores = self.decision_function(X)
         preds = np.where(scores > self.threshold, -1, 1)
-        return preds
+        return np.asarray(preds)
 
     def decision_function(self, X: np.ndarray) -> np.ndarray:
-        if not TORCH_AVAILABLE:
+        if not TORCH_AVAILABLE or self.model is None:
             return np.zeros(len(X))
-
         X_tensor = torch.tensor(X, dtype=torch.float32).to(self.device)
         self.model.eval()
         with torch.no_grad():
             reconstructed = self.model(X_tensor)
             mse = torch.mean((X_tensor - reconstructed) ** 2, dim=1).cpu().numpy()
-        return mse
+        return np.asarray(mse)
