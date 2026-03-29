@@ -31,18 +31,14 @@ _TOKEN_TTL_SECONDS = int(os.getenv("ORBIT_Q_TOKEN_TTL", "3600"))
 
 
 # Token Validation
-def generate_stream_token(
-    satellite_id: str, timestamp: Optional[int] = None
-) -> str:
+def generate_stream_token(satellite_id: str, timestamp: Optional[int] = None) -> str:
     """
     Generate an HMAC-SHA256 token for a satellite telemetry stream.
     Format: ``{satellite_id}:{timestamp}:{signature}``
     """
     ts = timestamp or int(time.time())
     payload = f"{satellite_id}:{ts}"
-    sig = hmac.new(
-        _SIGNING_SECRET.encode(), payload.encode(), hashlib.sha256
-    ).hexdigest()
+    sig = hmac.new(_SIGNING_SECRET.encode(), payload.encode(), hashlib.sha256).hexdigest()
     return f"{payload}:{sig}"
 
 
@@ -65,9 +61,7 @@ def validate_stream_token(token: str) -> bool:
             )
             return False
         payload = f"{satellite_id}:{ts_str}"
-        expected_sig = hmac.new(
-            _SIGNING_SECRET.encode(), payload.encode(), hashlib.sha256
-        ).hexdigest()
+        expected_sig = hmac.new(_SIGNING_SECRET.encode(), payload.encode(), hashlib.sha256).hexdigest()
         return hmac.compare_digest(expected_sig, provided_sig)
     except Exception as exc:
         log.error("Token validation error: %s", exc)
@@ -78,11 +72,7 @@ def validate_stream_token(token: str) -> bool:
 _AUDIT_LOG_PATH = os.getenv("ORBIT_Q_AUDIT_LOG", "audit.log")
 
 
-def audit(
-    event: str,
-    satellite_id: str = "unknown",
-    extra: Optional[dict] = None,
-) -> None:
+def audit(event: str, satellite_id: str = "unknown", extra: Optional[dict] = None) -> None:
     """
     Append a structured JSON audit event to the audit log file.
     Events: TELEMETRY_INGESTED | ANOMALY_DETECTED | MODEL_RETRAINED | AUTH_FAIL
