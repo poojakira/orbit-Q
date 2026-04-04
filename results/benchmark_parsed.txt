@@ -1,0 +1,191 @@
+﻿.venv\Scripts\python.exe : 
+C:\Users\pooja\Downloads\or
+bit_q\src\orbit_q\config.py
+:9: RuntimeWarning: 
+FIREBASE_DB_URL 
+environment variable is 
+not set. 
+Firebase-dependent 
+features will be 
+unavailable.
+At line:1 char:55
++ ... NG="utf-8"; 
+.venv\Scripts\python.exe 
+-m orbit_q.cli benchmark > 
+bench ...
++                 ~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo         
+     : NotSpecified: (C:\  
+  Users\pooja\...be unav   
+ ailable.:String) [], R    
+emoteException
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 
+  warnings.warn(
+2026/04/03 19:32:01 INFO 
+mlflow.store.db.utils: 
+Creating initial MLflow 
+database tables...
+2026/04/03 19:32:01 INFO 
+mlflow.store.db.utils: 
+Updating database tables
+INFO  [alembic.runtime.migr
+ation] Context impl 
+SQLiteImpl.
+INFO  [alembic.runtime.migr
+ation] Will assume 
+non-transactional DDL.
+INFO  [alembic.runtime.migr
+ation] Running upgrade  -> 
+451aebb31d03, add metric 
+step
+INFO  [alembic.runtime.migr
+ation] Running upgrade 
+451aebb31d03 -> 
+90e64c465722, migrate user 
+column to tags
+INFO  [alembic.runtime.migr
+ation] Running upgrade 
+90e64c465722 -> 
+181f10493468, allow nulls 
+for metric values
+INFO  [alembic.runtime.migr
+ation] Running upgrade 
+181f10493468 -> 
+df50e92ffc5e, Add 
+Experiment Tags Table
+INFO  [alembic.runtime.migr
+ation] Running upgrade 
+df50e92ffc5e -> 
+7ac759974ad8, Update run 
+tags with larger limit
+INFO  [alembic.runtime.migr
+ation] Running upgrade 
+7ac759974ad8 -> 
+89d4b8295536, create 
+latest metrics table
+INFO  [89d4b8295536_create_
+latest_metrics_table_py] 
+Migration complete!
+INFO  [alembic.runtime.migr
+ation] Running upgrade 
+89d4b8295536 -> 
+2b4d017a5e9b, add model 
+registry tables to db
+INFO  [2b4d017a5e9b_add_mod
+el_registry_tables_to_db_py
+] Adding registered_models 
+and model_versions tables 
+to database.
+INFO  [2b4d017a5e9b_add_mod
+el_registry_tables_to_db_py
+] Migration complete!
+INFO  [alembic.runtime.migr
+ation] Running upgrade 
+2b4d017a5e9b -> 
+cfd24bdc0731, Update run 
+status constraint with 
+killed
+INFO  [alembic.runtime.migr
+ation] Running upgrade 
+cfd24bdc0731 -> 
+0a8213491aaa, drop_duplicat
+e_killed_constraint
+INFO  [alembic.runtime.migr
+ation] Running upgrade 
+0a8213491aaa -> 
+728d730b5ebd, add 
+registered model tags table
+INFO  [alembic.runtime.migr
+ation] Running upgrade 
+728d730b5ebd -> 
+27a6a02d2cf1, add model 
+version tags table
+INFO  [alembic.runtime.migr
+ation] Running upgrade 
+27a6a02d2cf1 -> 
+84291f40a231, add run_link 
+to model_version
+INFO  [alembic.runtime.migr
+ation] Running upgrade 
+84291f40a231 -> 
+a8c4a736bde6, allow nulls 
+for run_id
+INFO  [alembic.runtime.migr
+ation] Running upgrade 
+a8c4a736bde6 -> 
+39d1c3be5f05, add_is_nan_co
+nstraint_for_metrics_tables
+_if_necessary
+INFO  [alembic.runtime.migr
+ation] Running upgrade 
+39d1c3be5f05 -> 
+c48cb773bb87, reset_default
+_value_for_is_nan_in_metric
+s_table_for_mysql
+INFO  [alembic.runtime.migr
+ation] Running upgrade 
+c48cb773bb87 -> 
+bd07f7e963c5, create index 
+on run_uuid
+INFO  [alembic.runtime.migr
+ation] Running upgrade 
+bd07f7e963c5 -> 
+0c779009ac13, add 
+deleted_time field to runs 
+table
+INFO  [alembic.runtime.migr
+ation] Running upgrade 
+0c779009ac13 -> 
+cc1f77228345, change param 
+value length to 500
+INFO  [alembic.runtime.migr
+ation] Running upgrade 
+cc1f77228345 -> 
+97727af70f4d, Add 
+creation_time and 
+last_update_time to 
+experiments table
+INFO  [alembic.runtime.migr
+ation] Running upgrade 
+97727af70f4d -> 
+3500859a5d39, Add Model 
+Aliases table
+INFO  [alembic.runtime.migr
+ation] Running upgrade 
+3500859a5d39 -> 
+7f2a7d5fae7d, add datasets 
+inputs input_tags tables
+INFO  [alembic.runtime.migr
+ation] Running upgrade 
+7f2a7d5fae7d -> 
+2d6e25af4d3e, increase max 
+param val length from 500 
+to 8000
+INFO  [alembic.runtime.migr
+ation] Running upgrade 
+2d6e25af4d3e -> 
+acf3f17fdcc7, add storage 
+location field to model 
+versions
+INFO  [alembic.runtime.migr
+ation] Context impl 
+SQLiteImpl.
+INFO  [alembic.runtime.migr
+ation] Will assume 
+non-transactional DDL.
+Warning: PyTorch could not be loaded: No module named 'torch'
+Warning: PyTorch unavailable (No module named 'torch') - LSTM disabled
+
+≡ƒ¢░∩╕Å  Orbit-Q Benchmark  |  100 Hz  |  10s window
+============================================================
+  Samples           : 1,000
+  Train time        : 7432.9 ms
+  Infer time        : 15.7 ms
+  Latency/detection : 15.72 ┬╡s
+  Throughput        : 63,622 samples/s
+  Anomaly rate      : 0.0%
+============================================================

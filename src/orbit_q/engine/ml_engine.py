@@ -70,8 +70,13 @@ class AnomalyEngine:
             # 3. Train LSTM Temporal Detector
             self.lstm_model = LSTMTemporalDetector(input_dim=input_dim, epochs=15)
             self.lstm_model.fit(X)
-            # Log models
-            mlflow.sklearn.log_model(self.iso_model, "iso_model")
+            # Log and REGISTER the models for version control
+            # We log the sub-models individually to the registry
+            mlflow.sklearn.log_model(
+                self.iso_model, 
+                "iso_model",
+                registered_model_name="Orbit-Q-IsolationForest"
+            )
             mlflow.log_param("ensemble_models", "IsolationForest+Autoencoder+LSTM")
             os.makedirs("models", exist_ok=True)
             with open(config.MODEL_PATH, "wb") as f:

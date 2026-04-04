@@ -27,6 +27,14 @@ except Exception:
     TORCH_AVAILABLE = False
 
 
+# --- 🚀 ADDED C++ OPTIMIZATION ---
+try:
+    from orbit_q.engine.kernels import orbit_q_cpp
+    CPP_AVAILABLE = True
+except ImportError:
+    CPP_AVAILABLE = False
+
+
 # ── Triton Kernel (GPU) ─────────────────────────────────────────────────────────────────────────────────
 if TRITON_AVAILABLE and TORCH_AVAILABLE:
 
@@ -93,8 +101,16 @@ def fuse_scores(
     Uses CUDA Triton kernel when available, falls back to NumPy otherwise.
     """
     ae_w = ae_weight if ae_weight is not None else (1.0 - iso_weight)
+    
+    # 1. ⚡ TRY C++ (Edge Optimization)
+    if CPP_AVAILABLE:
+        return orbit_q_cpp.fuse_scores(iso_scores, ae_scores, iso_weight, ae_w)
+    
+    # 2. 🌊 TRY TRITON (GPU Acceleration)
     if TRITON_AVAILABLE and TORCH_AVAILABLE and torch.cuda.is_available():
         return _triton_fuse(iso_scores, ae_scores, iso_weight, ae_w)
+    
+    # 3. 🐢 FALLBACK TO NUMPY (CPU Native)
     return _numpy_fuse(iso_scores, ae_scores, iso_weight, ae_w)
 
 

@@ -6,6 +6,7 @@ from firebase_admin import db, credentials
 from orbit_q import config
 import logging
 import os
+from orbit_q.ingestion.kafka_client import OrbitKafkaClient
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
@@ -16,6 +17,8 @@ if not firebase_admin._apps:
     except Exception as e:
         logging.warning(f"Failed to initialize Firebase (mock mode or missing creds): {e}")
 
+
+kafka_client = OrbitKafkaClient()
 faces = ["NORTH", "SOUTH", "EAST", "WEST"]
 
 
@@ -53,10 +56,16 @@ def transmit():
         }
 
         if db.reference:
-            db.reference("/SENSOR_DATA").push(packet)
+            try:
+                db.reference("/SENSOR_DATA").push(packet)
+            except Exception as e:
+                logging.debug(f"Firebase push failed (likely mock mode): {e}")
 
-        logging.info(f"Sent: {face} | Dist: {distance:.2f}cm | Label: {'ANOMALY' if is_anomaly else 'NOMINAL'}")
-        time.sleep(1)
+        # --- 🚀 ADDED KAFKA INGESTION ---
+        kafka_client.produce_telemetry(packet)
+
+        logging.info(f"Sent: {face} | Dist: {distance:.2f}cm | Label: {'ANOMALY' if is_anomaly else 'NOMINAL'} | Kafka: OK")
+        time.sleep(0.5)  # Increased frequency for high-throughput testing
 
 
 if __name__ == "__main__":

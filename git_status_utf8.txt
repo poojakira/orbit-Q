@@ -1,0 +1,25 @@
+﻿On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   Dockerfile
+	modified:   Makefile
+	modified:   README.md
+	modified:   docker-compose.yml
+	modified:   pyproject.toml
+	modified:   src/orbit_q/orchestrator/ml_orchestrator.py
+	modified:   src/orbit_q/sensor_anomaly_pipeline.py
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	git_status.txt
+	git_status_utf8.txt
+	pytest_log.txt
+	pytest_output.txt
+	pytest_results.txt
+	test_clean.py
+	test_log.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")

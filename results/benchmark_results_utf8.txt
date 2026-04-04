@@ -1,0 +1,70 @@
+﻿.venv\Scripts\python.exe : 
+C:\Users\pooja\Downloads\or
+bit_q\src\orbit_q\config.py
+:9: RuntimeWarning: 
+FIREBASE_DB_URL 
+environment variable is 
+not set. 
+Firebase-dependent 
+features will be 
+unavailable.
+At line:1 char:24
++ ... PATH="src"; 
+.venv\Scripts\python.exe 
+-m orbit_q.cli benchmark 
+2>&1 |  ...
++                 ~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
+    + CategoryInfo         
+     : NotSpecified: (C:\  
+  Users\pooja\...be unav   
+ ailable.:String) [], R    
+emoteException
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 
+  warnings.warn(
+Traceback (most recent 
+call last):
+  File "<frozen runpy>", 
+line 198, in 
+_run_module_as_main
+  File "<frozen runpy>", 
+line 88, in _run_code
+  File "C:\Users\pooja\Down
+loads\orbit_q\src\orbit_q\c
+li.py", line 153, in 
+<module>
+    main()
+  File "C:\Users\pooja\Down
+loads\orbit_q\src\orbit_q\c
+li.py", line 149, in main
+    dispatch[args.command](
+args)
+  File "C:\Users\pooja\Down
+loads\orbit_q\src\orbit_q\c
+li.py", line 49, in 
+cmd_benchmark
+    
+print(f"\n\U0001f6f0\ufe0f 
+ Orbit-Q Benchmark  |  
+{args.hz} Hz  |  
+{args.seconds}s window")
+  File "C:\Users\pooja\AppD
+ata\Local\Programs\Python\P
+ython312\Lib\encodings\cp12
+52.py", line 19, in encode
+    return codecs.charmap_e
+ncode(input,self.errors,enc
+oding_table)[0]
+           ^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^
+UnicodeEncodeError: 
+'charmap' codec can't 
+encode characters in 
+position 2-3: character 
+maps to <undefined>
+Warning: PyTorch could not be loaded: No module named 'torch'
+Warning: PyTorch unavailable (No module named 'torch') - LSTM disabled

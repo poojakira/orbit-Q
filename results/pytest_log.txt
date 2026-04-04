@@ -1,0 +1,35 @@
+=== STDOUT ===
+============================= test session starts =============================
+platform win32 -- Python 3.12.9, pytest-9.0.2, pluggy-1.6.0
+rootdir: C:\Users\pooja\Downloads\orbit_q
+configfile: pyproject.toml
+plugins: cov-7.0.0
+collected 11 items
+
+tests\test_ml_engine.py ...                                              [ 27%]
+tests\test_security_and_stress.py .......                                [ 90%]
+tests\test_simulator.py .                                                [100%]
+
+============================== warnings summary ===============================
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: Type google._upb._message.MessageMapContainer uses PyType_Spec with a metaclass that has custom tp_new. This is deprecated and will no longer be allowed in Python 3.14.
+
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: Type google._upb._message.ScalarMapContainer uses PyType_Spec with a metaclass that has custom tp_new. This is deprecated and will no longer be allowed in Python 3.14.
+
+.venv\Lib\site-packages\mlflow\utils\requirements_utils.py:20
+  C:\Users\pooja\Downloads\orbit_q\.venv\Lib\site-packages\mlflow\utils\requirements_utils.py:20: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html
+    import pkg_resources  # noqa: TID251
+
+src\orbit_q\config.py:9
+  C:\Users\pooja\Downloads\orbit_q\src\orbit_q\config.py:9: RuntimeWarning: FIREBASE_DB_URL environment variable is not set. Firebase-dependent features will be unavailable.
+    warnings.warn(
+
+src\orbit_q\security.py:22
+  C:\Users\pooja\Downloads\orbit_q\src\orbit_q\security.py:22: RuntimeWarning: ORBIT_Q_SIGNING_SECRET is not set. Using an insecure empty secret. Set this environment variable before deploying.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= 11 passed, 5 warnings in 17.72s =======================
+
+=== STDERR ===

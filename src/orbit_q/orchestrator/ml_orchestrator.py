@@ -8,6 +8,7 @@ import mlflow
 from orbit_q.orchestrator.feature_processor import FeatureProcessor
 from orbit_q.engine.ml_engine import AnomalyEngine
 from orbit_q.engine.metrics_evaluator import MetricsEvaluator
+from orbit_q.ingestion.kafka_client import OrbitKafkaClient
 from orbit_q import config
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -24,15 +25,23 @@ class MLOrchestrator:
     def __init__(self) -> None:
         """Initializes the ML Orchestrator with the Anomaly Engine subsystem."""
         self.engine: AnomalyEngine = AnomalyEngine()
+        self.kafka_client = OrbitKafkaClient()
         self.LEGACY_LATENCY: float = 2.0  # Baseline response requirement for comparative metrics
+        self.polling_interval: float = 10.0  # Default adaptive window
 
     def fetch_and_process(self) -> Optional[pd.DataFrame]:
         """
-        Fetches the latest telemetry vector from Firebase and extracts features.
+        Fetches telemetry from Kafka (Primary) or Firebase (Fallback).
 
         Returns:
             Optional[pd.DataFrame]: A processed pandas DataFrame containing model features, or None if fetch fails.
         """
+        # 1. 🚀 TRY KAFKA FIRST (High Throughput)
+        kafka_batch = self.kafka_client.consume_batch(limit=500)
+        if kafka_batch:
+            return FeatureProcessor.process_telemetry({str(i): msg for i, msg in enumerate(kafka_batch)})
+        
+        # 2. 🔥 FALLBACK TO FIREBASE (Command & Control)
         try:
             raw = db.reference("/SENSOR_DATA").order_by_key().limit_to_last(500).get()
             if not raw:
@@ -121,14 +130,20 @@ class MLOrchestrator:
 
         db.reference("/SYSTEM_METRICS").set(metrics_payload)
 
-        # Dispatch Critical Alerts if outlier threshold breached
-        df["anomaly"] = preds
-        anoms = df[df["anomaly"] == -1]
+        # 6. 🧠 ADAPTIVE WINDOWING LOGIC
+        # If any anomalies are detected in the current window, decrease polling interval
+        # to ensure higher system responsiveness.
+        if not anoms.empty:
+            self.polling_interval = 0.5  # High frequency monitoring
+            logging.warning(f"⚠️ ANOMALY DETECTED! Module Accuracy Status: {accuracy_score:.1f}%. Increasing polling frequency (0.5s)")
+        else:
+            self.polling_interval = 10.0  # Nominal state (power-saving)
+            logging.info(f"✅ NOMINAL. Polling frequency (10.0s)")
+
         if not anoms.empty:
             alert = anoms.tail(1).to_dict("records")[0]
             alert["timestamp"] = str(alert["timestamp"])
             db.reference("/ML_ALERTS").push(alert)
-            logging.warning(f"⚠️ ANOMALY DETECTED! Module Accuracy Status: {accuracy_score:.1f}%")
 
 
 if __name__ == "__main__":
@@ -144,4 +159,4 @@ if __name__ == "__main__":
 
     while True:
         orchestrator.run_cycle()
-        time.sleep(10)
+        time.sleep(orchestrator.polling_interval)
