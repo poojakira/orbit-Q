@@ -16,10 +16,8 @@ import logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s")
 
 # CONFIG - Environment variables replace hardcoded strings
-FIREBASE_DB_URL = os.getenv(
-    "FIREBASE_DB_URL", "https://cubesat-5403b-default-rtdb.asia-southeast1.firebasedatabase.app/"
-)
-SERVICE_ACCOUNT_PATH = os.getenv("SERVICE_ACCOUNT_PATH", "service_account.json")
+FIREBASE_DB_URL = os.getenv("FIREBASE_DB_URL", "") or config.DB_URL
+SERVICE_ACCOUNT_PATH = os.getenv("SERVICE_ACCOUNT_PATH", "") or config.SERVICE_ACCOUNT
 MODEL_PATH = "model.pkl"
 ROLLING_WINDOW = 5
 ANOMALY_CONTAMINATION = 0.05
@@ -46,10 +44,12 @@ def fetch_sensor_data() -> pd.DataFrame:
 def build_features(df: pd.DataFrame) -> pd.DataFrame:
     df = df.sort_values("timestamp")
     # Feature windowing as described in project overview
-    for feat in ["rolling_mean", "rolling_std"]:
-        df[feat] = df.groupby("face")["distance_cm"].transform(
-            lambda x: x.rolling(ROLLING_WINDOW).mean() if "mean" in feat else x.rolling(ROLLING_WINDOW).std()
-        )
+    df["rolling_mean"] = df.groupby("face")["distance_cm"].transform(
+        lambda x: x.rolling(ROLLING_WINDOW).mean()
+    )
+    df["rolling_std"] = df.groupby("face")["distance_cm"].transform(
+        lambda x: x.rolling(ROLLING_WINDOW).std()
+    )
     return df.dropna()
 
 

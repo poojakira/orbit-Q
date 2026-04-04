@@ -3,19 +3,13 @@ version: '3.8'
 services:
   ingestion:
     build: .
-    command: python mock_telemetry.py
-    environment:
-      - PYTHONUNBUFFERED=1
-
-  models:
-    build: .
-    command: python ml_engine.py
+    command: python -m orbit_q.simulator.mock_telemetry
     environment:
       - PYTHONUNBUFFERED=1
 
   orchestrator:
     build: .
-    command: python ml_orchestrator.py
+    command: python -m orbit_q.orchestrator.ml_orchestrator
     environment:
       - PYTHONUNBUFFERED=1
 
@@ -23,6 +17,6 @@ services:
     build: .
     ports:
       - "8501:8501"
-    command: streamlit run dashboard.py
+    command: streamlit run src/orbit_q/dashboard/dashboard.py --server.port=8501 --server.address=0.0.0.0
     environment:
       - PYTHONUNBUFFERED=1

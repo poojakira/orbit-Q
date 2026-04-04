@@ -18,7 +18,7 @@ install:
 	pip install -e .[dev]
 
 run:
-	streamlit run dashboard.py
+	orbit-q dashboard
 
 test:
 	pytest tests/ -v --cov=.
