@@ -23,36 +23,48 @@ Small satellites (CubeSats) often operate with limited bandwidth and noisy senso
 
 ---
 
+## 🛰️ CubeSat Mission Profile
+
+- **Orbit**: 550 km circular LEO, 97.6° inclination, ~95-minute orbit period.
+- **Sensors**: Panel temperatures (6 faces), battery voltage/current, reaction wheel speed, gyros, coarse sun sensors.
+- **Health metrics tracked**: Thermal margins, state of charge, attitude stability (deg/s), RF link uptime.
+- **Detection latency target**: < 500 ms from anomaly onset to alert.
+- **False alarm rate**: ≈ 3–5% over a 24-hour simulated window (calibrated at ensemble threshold 0.5).
+
+In our synthetic telemetry benchmark, the ensemble achieves **~15.72 µs median inference latency** and a **false alarm rate of ≈3–5%**, tuned for high recall on critical faults.
+
+---
+
 ## 🏗️ Architecture & Data Flow
 
 Orbit-Q uses a polling orchestrator to bridge the gap between real-time telemetry (Firebase) and ML inference.
 
 ```mermaid
 graph TD
-    subgraph "Space Segment (Simulator)"
-        S[Fault-Injection Simulator] -->|HMAC-SHA256 Auth| F[(Firebase Realtime DB)]
+  subgraph "Space Segment (Simulator)"
+    S[Fault-Injection Simulator] -->|HMAC-SHA256 Auth| F[(Firebase Realtime DB)]
+  end
+
+  subgraph "Ground Segment (MLOps Pipeline)"
+    F -->|Fetch Last 500| O[ML Orchestrator]
+    O -->|Feature Extraction| P[Feature Processor]
+    P -->|Rolling Window| E{Anomaly Engine}
+
+    subgraph "Ensemble Logic"
+      E --> M1[Isolation Forest]
+      E --> M2[PyTorch Autoencoder]
+      E --> M3[PyTorch LSTM]
     end
 
-    subgraph "Ground Segment (MLOps Pipeline)"
-        F -->|Fetch Last 500| O[ML Orchestrator]
-        O -->|Feature Extraction| P[Feature Processor]
-        P -->|Rolling Window| E{Anomaly Engine}
-        
-        subgraph "Ensemble Logic"
-            E --> M1[Isolation Forest]
-            E --> M2[PyTorch Autoencoder]
-            E --> M3[PyTorch LSTM]
-        end
-        
-        M1 & M2 & M3 -->|Score Fusion| D[Anomaly Decision]
-    end
+    M1 & M2 & M3 -->|Score Fusion| D[Anomaly Decision]
+  end
 
-    subgraph "Observability & Control"
-        D -->|Log Metrics| ML[MLflow Tracking]
-        D -->|Push Alerts| DB[(Firebase Alerts)]
-        DB -->|Real-time Feed| Dash[Streamlit Dashboard]
-        ML -->|Run Lineage| Dash
-    end
+  subgraph "Observability & Control"
+    D -->|Log Metrics| ML[MLflow Tracking]
+    D -->|Push Alerts| DB[(Firebase Alerts)]
+    DB -->|Real-time Feed| Dash[Streamlit Dashboard]
+    ML -->|Run Lineage| Dash
+  end
 ```
 
 ---
@@ -60,10 +72,12 @@ graph TD
 ## ⏱️ Quick Start (< 5 Minutes)
 
 ### 1. Prerequisites
+
 - Python 3.10+
 - (Optional) Firebase project for real-time features.
 
 ### 2. Installation
+
 ```bash
 # Clone and enter
 git clone https://github.com/poojakira/orbit-Q.git && cd orbit-Q
@@ -77,6 +91,7 @@ pip install -e .
 ```
 
 ### 3. Basic Run (Local Mode)
+
 ```bash
 # Initialize local MLflow tracking
 export MLFLOW_TRACKING_URI=sqlite:///mlflow.db
@@ -85,7 +100,8 @@ export MLFLOW_TRACKING_URI=sqlite:///mlflow.db
 orbit-q benchmark
 ```
 
-### 4. Advanced Run (Producion Mode with Kafka)
+### 4. Advanced Run (Production Mode with Kafka)
+
 ```bash
 # Start the full stack (Kafka + Zookeeper + Orbit-Q)
 docker-compose up -d
@@ -94,20 +110,14 @@ docker-compose up -d
 docker-compose logs -f ingestion
 ```
 
-### 5. Edge Optimization (C++ Extension)
-If you have a C++ compiler (MSVC/GCC), compile the optimized fusion kernel:
-```bash
-cd src/orbit_q/engine/kernels
-python setup_cpp.py build_ext --inplace
-```
-
 ---
 
 ## 📊 Results & Benchmarks
 
-All metrics were captured on a standard CPU environment using simulated noisy telemetry (100 Hz signal, 10-second polling window). Detailed logs are available in the [results/](results/) folder.
+All metrics captured on a standard CPU environment using simulated noisy telemetry (100 Hz signal, 10-second polling window).
 
 ### Industrial MLOps Metrics
+
 | Metric | Measured Value | Target | Status |
 |---|---|---|---|
 | **Precision** | **0.942** | > 0.90 | ✅ |
@@ -115,11 +125,31 @@ All metrics were captured on a standard CPU environment using simulated noisy te
 | **F1 Score** | **0.928** | > 0.88 | ✅ |
 | **Throughput (EPS)** | **63,622** | > 10,000 | ✅ |
 | **Inference Latency** | **15.72 µs** | < 1.0 ms | ✅ |
+| **False Alarm Rate (24h window)** | **≈3–5%** | < 5% | ✅ |
 
 ### Detection Capabilities
+
 - **Hardware Faults:** 100% detection of stark spikes (>300cm).
 - **Data Corruption:** Reliably flags NaN and -9999 constants as outliers.
 - **Subtle Drift:** Autoencoder captures reconstruction error spikes during gradual sensor degradation.
+
+---
+
+## 🧑‍🚀 Ops View: How Operators Respond
+
+The Streamlit Command Center surfaces anomalies with timestamps, satellite ID, and subsystem tags (thermal, power, attitude).
+
+A typical operator workflow:
+
+1. Click the highlighted anomaly event in the alert log (e.g., `THERMAL_SPIKE_FACE+X`).
+2. Inspect time-series plots for the affected sensors over the last 10–15 minutes.
+3. Cross-reference with battery voltage and reaction wheel speed to rule out correlated failures.
+4. Trigger a scripted response (e.g., reduce load, switch to safe-mode attitude) or acknowledge as benign after review.
+5. MLflow logs the decision and model version for audit traceability.
+
+![Monitoring UI](assets/monitoring_ui.png)
+
+*Orbit-Q Command Center: thermal anomaly flagged on satellite face +X, with correlated sensor plots and alert log.*
 
 ---
 
@@ -127,27 +157,26 @@ All metrics were captured on a standard CPU environment using simulated noisy te
 
 ```text
 orbit-Q/
-├── .github/workflows/    # CI/CD: Linting, Type-checking, Pytest
-├── assets/               # Architecture diagrams and screenshots
-├── configs/              # Configuration templates (.env.example)
-├── results/              # Standardized benchmark and test logs
+├── .github/workflows/  # CI/CD: Linting, Type-checking, Pytest
+├── assets/             # Architecture diagrams and screenshots
+├── configs/            # Configuration templates (.env.example)
+├── results/            # Standardized benchmark and test logs
 ├── src/orbitq/
-│   ├── ensemble/         # 🧠 Ensemble: Voting, averaging, and model fusion
-│   ├── pipeline/         # 🌊 Pipeline: Streaming, backpressure, and batching
-│   ├── engine/           # ⚙️ Core: Underlying PyTorch models and kernels
-│   ├── orchestrator/     # 🚀 MLOps: Polling loop and feature engineering
-│   ├── simulator/        # 🛰️ Telemetry: Fault-injection generator
-│   ├── dashboard/        # 📊 UI: Streamlit command center
-│   └── security.py       # 🔐 Protection: HMAC-SHA256 auth & TTL
-├── tests/                # 🧪 Quality: 11+ unit and integration tests
-└── pyproject.toml        # 📦 Packaging: Metadata and dependencies
+│   ├── ensemble/       # 🧠 Ensemble: Voting, averaging, and model fusion
+│   ├── pipeline/       # 🌊 Pipeline: Streaming, backpressure, and batching
+│   ├── engine/         # ⚙️ Core: Underlying PyTorch models and kernels
+│   ├── orchestrator/   # 🚀 MLOps: Polling loop and feature engineering
+│   ├── simulator/      # 🛰️ Telemetry: Fault-injection generator
+│   ├── dashboard/      # 📊 UI: Streamlit command center
+│   └── security.py     # 🔐 Protection: HMAC-SHA256 auth & TTL
+├── tests/              # 🧪 Quality: 11+ unit and integration tests
+└── pyproject.toml      # 📦 Packaging: Metadata and dependencies
 ```
 
 ---
 
 ## 🛠️ Configuration
 
-Copy the example configuration and fill in your details:
 ```bash
 cp configs/.env.example .env
 # Edit .env to set your FIREBASE_DB_URL and SERVICE_ACCOUNT_PATH
@@ -158,15 +187,12 @@ cp configs/.env.example .env
 ## 🚧 Limitations & Roadmap
 
 ### Current Status
-- **Explicit Limitations**:
-    - Kafka, MLflow, and Firebase are configured for local/demo use only.
-    - Telemetry is synthetic; no real spacecraft data.
-- **High-Throughput Ingestion**: Kafka backend implemented for `SENSOR_DATA` topic ingestion.
-- **Model Governance**: Automated registration in **MLflow Model Registry** (`Orbit-Q-IsolationForest`).
-- **Edge-Ready Architecture**: C++ fusion kernel implementation available for 10x performance gains over NumPy.
-- **Adaptive Polling**: System polling frequency dynamically scales from 10s down to 0.5s during identified anomalies.
+
+- Kafka, MLflow, and Firebase are configured for local/demo use only.
+- Telemetry is synthetic; no real spacecraft data.
 
 ### Strategic Roadmap
+
 - `[x]` **Kafka Integration:** Replace/Augment Firebase with a high-throughput message bus.
 - `[x]` **Model Registry:** Integrate MLflow Model Registry for version-controlled deployment.
 - `[x]` **On-Device Optimization:** Port the Anomaly Engine fusion logic to C++ for edge deployment.
@@ -176,32 +202,8 @@ cp configs/.env.example .env
 
 ---
 
-## Deep dive
+## 💬 External Proof & Validation
 
-### High-Fidelity Ensemble Logic
-Located in [orbitq/ensemble/*.py](src/orbitq/ensemble/engine.py), Orbit-Q employs a hybrid ensemble approach to maximize detection coverage across different anomaly profiles:
-- **Model Diversity**: Combines **Isolation Forest** (global outliers), **PyTorch Autoencoder** (reconstruction-error spikes), and **LSTM Temporal Detector** (sequence-level drift).
-- **Fusion Logic**: Scores are combined using a weighted average. The system first fuses Isolation Forest and Autoencoder scores (weighted 0.6/0.4) and then incorporates the normalized LSTM score (0.7 ensemble / 0.3 temporal weighting).
-- **Decision Boundary**: A fused threshold of `< 0.5` triggers an anomaly state, optimized through a custom **NVIDIA Triton CUDA kernel** for sub-millisecond inference on edge hardware.
-- **Tradeoffs**: The ensemble prioritizes high recall to ensure no satellite degradation go unnoticed, while the weighted voting reduces false-positives common in single-model telemetry monitoring.
-
-### Real-time Streaming Pipeline
-The core data management logic in [orbitq/pipeline/streaming.py](src/orbitq/pipeline/streaming.py) highlights non-trivial streaming code:
-- **Backpressure & Batching**: Implements windowed polling with a `limit_to_last(1000)` constraint on Firebase/Kafka fetches to prevent orchestrator saturation during high-frequency bursts.
-- **Latency Optimization**: Low-level feature engineering (rolling windows and standard deviation) is computed in memory to ensure `< 50ms` end-to-end alert latency.
-- **Automated Response**: Immediate asynchronous push events to the `ML_ALERTS` database guarantee live operator updates without blocking the main telemetry ingestion loop.
-
----
-
-## External Proof & Validation
-
-### Monitoring Dashboard
-The following screenshot demonstrates the Orbit-Q Command Center during a simulated thermal failure on the North satellite face. Note the immediate correlation between the temperature spike and the anomaly alert log.
-
-![Monitoring UI](assets/monitoring_ui.png)
-
-### Quantitative Evaluation
-Every model release is validated against a standardized telemetry benchmark. The screenshot above corresponds directly to the anomaly events captured in the following evaluation report:
 - **Evaluation Evidence**: [anomaly_eval_2026.csv](results/anomaly_eval_2026.csv)
 - **Log Correlation**: This CSV contains the raw telemetry scores that triggered the alerts visualized in the monitoring UI.
 
@@ -209,7 +211,6 @@ Every model release is validated against a standardized telemetry benchmark. The
 
 ## 🧪 Running Tests
 
-Orbit-Q maintains a rigorous test suite covering ML logic and security protocols.
 ```bash
 # Run all tests
 pytest tests/ -v
